@@ -6,6 +6,23 @@ An AI-powered conversational shopping assistant that helps users discover produc
 Search using text, photos, or both to find relevant products instantly—no endless catalog
 browsing required.
 
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        MULTIMODAL PRODUCT DISCOVERY                             │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              INITIALIZATION                                     │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────────────────┐  │
+│  │   CLIP Model    │    │  CrossEncoder   │    │      Vector Database        │  │
+│  │  (ViT-L/14)     │    │  (MS-MARCO)     │    │   (Cosine Similarity)       │  │
+│  └─────────────────┘    └─────────────────┘    └─────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Tech Stack
 
 - **Frontend**: React
