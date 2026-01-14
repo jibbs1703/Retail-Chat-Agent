@@ -1,4 +1,4 @@
-.PHONY: add commit push clear-pycache clear-ruff clear-pytest
+.PHONY: add commit push start-qdrant start-backend start-app clean-app clear-pycache clear-ruff clear-pytest
 
 add:
 	git add .
@@ -19,7 +19,17 @@ start-backend:
 	docker build -t retail-chat-agent:latest .
 	docker run -p 8000:8000 retail-chat-agent:latest
 
-clear-pycache:docker run -p 8000:8000 retail-chat-agent:latest
+start-app:
+	docker compose down -v || true
+	docker compose up --build
+
+clean-app:
+	docker compose down -v || true
+	docker system prune -af --volumes
+	docker image prune -af
+	docker volume prune -af
+
+clear-pycache:
 	find . -type d -name '__pycache__' -exec rm -rf {} +
 
 clear-ruff: clear-pycache
