@@ -1,0 +1,59 @@
+name: retail-agent
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      redis:
+        condition: service_started
+      qdrant:
+        condition: service_started
+    networks:
+      - retail-agent-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/history/data
+    networks:
+      - retail-agent-network
+
+  qdrant:
+    build:
+      context: ./qdrant
+      dockerfile: Dockerfile
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - retail-agent-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  redis-data:
+    driver: local
+  qdrant_data:
+    driver: local
+networks:
+  retail-agent-network:
+    driver: bridge
