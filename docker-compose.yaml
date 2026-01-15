@@ -19,15 +19,23 @@ services:
       - retail-agent-network
 
   redis:
-    image: redis:latest
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
     container_name: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/history/data
+      - ./redis/data:/data
     networks:
       - retail-agent-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   qdrant:
     build:
@@ -39,7 +47,7 @@ services:
       - "6333:6333"
       - "6334:6334"
     volumes:
-      - qdrant_data:/qdrant/storage
+      - ./qdrant/storage:/qdrant/storage
     networks:
       - retail-agent-network
     healthcheck:
@@ -49,11 +57,6 @@ services:
       retries: 3
       start_period: 5s
 
-volumes:
-  redis-data:
-    driver: local
-  qdrant_data:
-    driver: local
 networks:
   retail-agent-network:
     driver: bridge

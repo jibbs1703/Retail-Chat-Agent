@@ -1,11 +1,10 @@
 """Retail Product Agent Backend Healthcheck Routes Module."""
 
-from typing import Any
-
 from fastapi import APIRouter
 from httpx import AsyncClient, HTTPError, TimeoutException
 
 from app.v1.core.configurations import get_settings
+from app.v1.models.healthcheck import HealthCheckResponse
 
 router = APIRouter()
 
@@ -16,9 +15,7 @@ async def get_qdrant_collections() -> list[str]:
     qdrant_collections = []
     try:
         async with AsyncClient() as http_client:
-            response = await http_client.get(
-                f"{settings.qdrant_url}/collections", timeout=5.0
-            )
+            response = await http_client.get(f"{settings.qdrant_url}/collections", timeout=5.0)
             if response.status_code == 200:
                 collections_data = response.json()
                 for collection in collections_data.get("collections", []):
@@ -29,8 +26,13 @@ async def get_qdrant_collections() -> list[str]:
     return qdrant_collections
 
 
-@router.get("/health")
-async def health_check() -> dict[str, Any]:
+@router.get(
+    "/health",
+    response_model=HealthCheckResponse,
+    summary="Health Check",
+    description="Check the health of the backend and its dependencies.",
+)
+async def health_check() -> HealthCheckResponse:
     """
     Check the health of services needed for the application.
 
@@ -40,7 +42,8 @@ async def health_check() -> dict[str, Any]:
     Returns:
         Dictionary containing health status information.
     """
-    return {
-        "Backend Status": "Running",
-        "Qdrant Collections": await get_qdrant_collections(),
+    health_check = {
+        "backend_status": "Running",
+        "qdrant_collections": await get_qdrant_collections(),
     }
+    return HealthCheckResponse(**health_check)
