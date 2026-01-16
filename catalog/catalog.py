@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import os
 import re
 from urllib.parse import urljoin, urlparse
 
@@ -13,6 +14,10 @@ from tqdm.asyncio import tqdm
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 logger = logging.getLogger("fashionnova_scraper")
+
+
+class S3Connection:
+    pass
 
 
 class WebScraper:
@@ -137,13 +142,16 @@ class WebScraper:
         return list(dict.fromkeys(urls))[:limit]
 
 
-async def scrape(
+async def scrape(  # noqa: C901
     concurrent_requests: int = 10,
     categories: tuple[str, ...] = ("shoes", "bodysuits", "jackets"),
     number_of_pages: int = 3,
     limit_per_page: int = 60,
-    output_file: str = "catalog.json",
+    save_local: bool = False,
+    output_dir: str = "catalog",
 ) -> None:
+    """Main orchestration function for scraping Product catalog."""
+    os.makedirs(output_dir, exist_ok=True)
     sem = asyncio.Semaphore(concurrent_requests)
 
     async with aiohttp.ClientSession() as session:
@@ -159,26 +167,50 @@ async def scrape(
 
         logger.info(f"Gathering product URLs from {len(collection_tasks)} collection pages...")
 
-        all_product_urls = []
-        for _, url in collection_tasks:
+        urls_by_category = {category: [] for category in categories}
+        for category, url in collection_tasks:
             urls = await scraper.get_product_urls_from_collection(url, limit=limit_per_page)
-            all_product_urls.extend(urls)
+            urls_by_category[category].extend(urls)
 
-        all_product_urls = list(dict.fromkeys(all_product_urls))
+        for category in urls_by_category:
+            urls_by_category[category] = list(dict.fromkeys(urls_by_category[category]))
 
-        logger.info(f"Scraping {len(all_product_urls)} products...")
+        total_urls = sum(len(urls) for urls in urls_by_category.values())
+        logger.info(f"Scraping {total_urls} products across {len(categories)} categories...")
 
-        tasks = [scraper.scrape_product(url) for url in all_product_urls]
+        results_by_category = {category: [] for category in categories}
 
-        results = []
-        for progress in tqdm.as_completed(tasks, total=len(tasks), desc="Scraping Products"):
-            results.append(await progress)
+        for category in categories:
+            if not urls_by_category[category]:
+                logger.info(f"No products found for category: {category}")
+                continue
+            tasks = [scraper.scrape_product(url) for url in urls_by_category[category]]
+            for progress in tqdm.as_completed(
+                tasks, total=len(tasks), desc=f"Scraping {category.title()}"
+            ):
+                result = await progress
+                results_by_category[category].append(result)
 
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(results, f, ensure_ascii=False, indent=2)
+        if save_local:
+            for category in categories:
+                if results_by_category[category]:
+                    output_file = f"{output_dir}/{category}_catalog.json"
+                    with open(output_file, "w", encoding="utf-8") as f:
+                        json.dump(results_by_category[category], f, ensure_ascii=False, indent=2)
 
-        success_count = sum(1 for result in results if "error" not in result)
-        logger.info(f"Finished. Total products successfully scraped: {success_count}")
+                    success_count = sum(
+                        1 for result in results_by_category[category] if "error" not in result
+                    )
+                    logger.info(f"Saved {success_count} products to {output_file}")
+
+            total_success = sum(
+                sum(1 for result in results_by_category[cat] if "error" not in result)
+                for cat in categories
+            )
+            logger.info(f"Finished. Total products successfully scraped: {total_success}")
+        else:
+            logger.info("Scraping completed. Results not saved locally as per configuration.")
+            # TODO: Implement S3 saving logic here.
 
 
 if __name__ == "__main__":

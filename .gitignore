@@ -9,7 +9,7 @@ __pycache__/
 # Database Files
 qdrant/storage/
 redis/data/
-
+catalog/**.json
 
 # Distribution / packaging
 .Python
