@@ -10,9 +10,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
-    environment:
-      - redis_url=redis://redis:6379
-      - qdrant_url=http://qdrant:6333
+    env_file:
+      - ./backend/app/v1/core/.env
     depends_on:
       redis:
         condition: service_started

@@ -13,7 +13,7 @@ def get_reranker():
     global _reranker
     if "_reranker" not in globals():
         load_dotenv()
-        _reranker = CrossEncoder(os.getenv("RERANK_MODEL_NAME"))
+        _reranker = CrossEncoder(os.getenv("rerank_model_name"))
     return _reranker
 
 

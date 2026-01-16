@@ -33,7 +33,7 @@ def load_clip_model() -> CLIPModel:
     global _clip_model
     if _clip_model is None:
         device = get_device()
-        model_name = os.getenv("CLIP_MODEL_NAME")
+        model_name = os.getenv("clip_model_name")
         _clip_model = CLIPModel.from_pretrained(model_name).to(device)
     return _clip_model
 
@@ -47,7 +47,7 @@ def load_clip_processor() -> CLIPProcessor:
     """
     global _clip_processor
     if _clip_processor is None:
-        model_name = os.getenv("CLIP_MODEL_NAME")
+        model_name = os.getenv("clip_model_name")
         _clip_processor = CLIPProcessor.from_pretrained(model_name)
     return _clip_processor
 
