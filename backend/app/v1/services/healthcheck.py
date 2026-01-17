@@ -43,7 +43,7 @@ async def get_qdrant_collections() -> list[str] | list[dict]:
             response = await http_client.get(f"{settings.qdrant_url}/collections", timeout=5.0)
             if response.status_code == 200:
                 collections_data = response.json()
-                for collection in collections_data.get("collections", []):
+                for collection in collections_data.get("result", {}).get("collections", []):
                     qdrant_collections.append(collection.get("name"))
         return qdrant_collections
     except (HTTPError, TimeoutException):

@@ -1,12 +1,10 @@
 """Retail Product Agent Backend Vectorstore Services Module."""
 
-import os
-
-from dotenv import load_dotenv
 from PIL import Image
 from qdrant_client.async_qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, QueryResponse, VectorParams
 
+from backend.app.v1.core.configurations import get_settings
 from backend.app.v1.services.embedding import embed_query
 from backend.app.v1.services.reranking import rerank_results
 
@@ -18,8 +16,8 @@ def get_vectorstore_client() -> AsyncQdrantClient:
     Returns:
         AsyncQdrantClient: The initialized Qdrant client.
     """
-    load_dotenv()
-    return AsyncQdrantClient(url=os.getenv("VECTORDB_URL"))
+    settings = get_settings()
+    return AsyncQdrantClient(url=settings.qdrant_url)
 
 
 async def create_collection(collection_name: str) -> None:
