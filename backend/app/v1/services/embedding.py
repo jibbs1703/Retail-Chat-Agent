@@ -76,11 +76,9 @@ def embed_query(query: str | Image.Image) -> np.ndarray:
         with torch.no_grad():
             emb = clip_model.get_image_features(**inputs)
     elif isinstance(query, str):
-        inputs = clip_processor(text=[query],
-                                return_tensors="pt",
-                                padding=True,
-                                truncation=True,
-                                max_length=77).to(device)
+        inputs = clip_processor(
+            text=[query], return_tensors="pt", padding=True, truncation=True, max_length=77
+        ).to(device)
         with torch.no_grad():
             emb = clip_model.get_text_features(**inputs)
     else:

@@ -18,9 +18,7 @@ async def check_redis_health(url: str = settings.redis_url) -> tuple[str, float,
         return "error", 0.0, str(e)
 
 
-async def check_qdrant_health(
-    url: str = settings.qdrant_url
-    ) -> tuple[str, float, str]:
+async def check_qdrant_health(url: str = settings.qdrant_url) -> tuple[str, float, str]:
     try:
         async with httpx.AsyncClient(timeout=2.0) as client:
             response = await client.get(f"{url}/collections")

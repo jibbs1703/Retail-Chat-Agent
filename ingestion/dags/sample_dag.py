@@ -6,12 +6,12 @@ from airflow.sdk import dag, task
 
 
 @dag(
-    dag_id='sample_hello_etl_dag',
-    description='Simple test DAG to verify Airflow Setup',
-    schedule='0/15 * * * *', # Every 15 minutes
+    dag_id="sample_hello_etl_dag",
+    description="Simple test DAG to verify Airflow Setup",
+    schedule="0/15 * * * *",  # Every 15 minutes
     start_date=datetime(2026, 1, 1),
     catchup=False,
-    tags=['managed'],
+    tags=["managed"],
 )
 def hello_etl():
     """Simple ETL DAG using TaskFlow API."""
@@ -22,7 +22,7 @@ def hello_etl():
         message = "Hello Extract"
         print(message)
         return message
-    
+
     @task
     def transform(data: str) -> str:
         """Transform task that modifies the extracted data."""

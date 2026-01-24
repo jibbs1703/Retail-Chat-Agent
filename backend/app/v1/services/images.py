@@ -135,10 +135,7 @@ def validate_image(image: Image.Image, max_size: int = None) -> None:
         )
 
 
-def resize_image(
-    image: Image.Image,
-    max_size: int = settings.max_image_size
-    ) -> Image.Image:
+def resize_image(image: Image.Image, max_size: int = settings.max_image_size) -> Image.Image:
     """Resize image if it exceeds max size while maintaining aspect ratio.
 
     Args:
@@ -164,10 +161,7 @@ def resize_image(
     return resized
 
 
-def process_image(
-    data: bytes | BinaryIO,
-    max_size: int = settings.max_image_size
-    ) -> Image.Image:
+def process_image(data: bytes | BinaryIO, max_size: int = settings.max_image_size) -> Image.Image:
     """Complete image processing pipeline: decode, validate, and resize.
 
     This is the main entry point for image processing throughout the application.

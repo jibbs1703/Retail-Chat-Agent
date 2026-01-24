@@ -22,7 +22,7 @@ class ApplicationSettings(BaseSettings):
     application_device: str = "cpu"
     application_name: str = "Retail Product Agent Backend"
     application_version: str = "1.0.0"
-    aws_access_key_id :str = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_access_key_id: str = os.getenv("AWS_ACCESS_KEY_ID")
     aws_region: str = os.getenv("AWS_REGION")
     aws_s3_bucket_name: str = os.getenv("AWS_S3_BUCKET_NAME")
     aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY")
