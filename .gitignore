@@ -11,6 +11,7 @@ qdrant/storage/
 redis/data/
 postgres/data
 catalog/**.json
+ingestion/logs/
 
 # Distribution / packaging
 .Python
