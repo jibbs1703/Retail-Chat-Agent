@@ -34,6 +34,10 @@ class ApplicationSettings(BaseSettings):
     postgres_password: str = os.getenv("POSTGRES_PASSWORD")
     postgres_port: int = int(os.getenv("POSTGRES_PORT"))
     postgres_user: str = os.getenv("POSTGRES_USER")
+    product_default_categories: list[str] = ["shoes", "bodysuits", "jackets"]
+    product_default_pages_per_category: int = 3
+    product_default_products_per_page: int = 60
+    product_default_concurrent_requests: int = 5
     qdrant_url: str = os.getenv("QDRANT_URL")
     redis_url: str = os.getenv("REDIS_URL")
     rerank_model_name: str = os.getenv("RERANK_MODEL_NAME")
